@@ -8,4 +8,4 @@ Contributions to this project are welcome! If you encounter any issues, have sug
 
 ## License
 
-This project is licensed under the MIT License. Feel free to modify and distribute the script according to the terms of this license.
+This project is licensed under the [MIT License](LICENSE). Feel free to modify and distribute the script according to the terms of this license.
