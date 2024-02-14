@@ -1,6 +1,6 @@
-# Logical Acquisition of Apple Silicon Mac
+# Apple Silicon Logical Acquisition Script
 
-This repository contains a bash script called `asm_acquire.sh` designed for performing forensically-sound logical acquisition of Apple Silicon Mac devices. This script facilitates the collection of data from an Apple Silicon Mac in a manner that maintains the integrity of the original data, ensuring that the acquisition process complies with forensic standards.
+The Apple Silicon Logical Acquisition (ASLA) script in this repository is a bash script called `asla.sh` designed for performing forensically-sound logical acquisition of Apple Silicon Mac devices. This script facilitates the collection of data from an Apple Silicon Mac in a manner that maintains the integrity of the original data, ensuring that the acquisition process complies with forensic standards.
 
 ## Contributing
 
