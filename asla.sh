@@ -61,7 +61,7 @@ cleanup() {
 #######################################
 print_usage() {
 cat << EOF
-  Usage:  ${0} target destination [-i image_name] [-s size] [-u utility]
+  Usage:  ${0} target destination [-a] [-c] [-i image_name] [-s size] [-u utility]
 
   target                      path to the target (i.e., the mount point of the Mac's shared disk to be acquired)
   destination                 path to the folder where the destination sparse image will be created
