@@ -495,7 +495,7 @@ main() {
 
   [[ -z "${target}" ]] && printf "Requires target folder\n\n" >&2 && print_usage >&2 && exit 1
   [[ -z "${destination}" ]] && printf "Requires destination folder\n\n" >&2 && print_usage >&2 && exit 1
-  [[ ! $(echo "${TOOLS[@]}" | grep -w "${tool}") ]] && printf "Unknown data transfer tool. Only cp and cp are supported\n\n" >&2 && print_usage >&2 && exit 1
+  [[ ! $(echo "${TOOLS[@]}" | grep -w "${tool}") ]] && printf "Unknown data transfer tool. Only cp and rsync are supported\n\n" >&2 && print_usage >&2 && exit 1
 
   # Acquisition
 
