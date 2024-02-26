@@ -4,7 +4,7 @@
 # Usage      : ./asla.sh /path/tp/target /path/to/destination
 # Author     : Giuseppe Totaro
 # Date       : 2024-02-01
-# Last Edited: 2024-02-19
+# Last Edited: 2024-02-26
 # Description: This script performs the logical acquisition of data from the 
 #              target (i.e., the Apple Silicon Mac to be acquired) started in 
 #              "share disk mode", by leveraging either "cp" or "rsync" on the 
@@ -51,6 +51,7 @@ cleanup() {
   echo "# An error occurred. Cleaning up..."
   [[ -d "${VOLUME_NAME}" ]] && detach_image "${VOLUME_NAME}"
   echo "# Process has been terminated with errors."
+  echo "# Check manually if target has been mounted anyway and, if so, unmount it."
 }
 
 #######################################
@@ -238,7 +239,7 @@ EOF
 
   mkdir -p "${destination}"
   destination_fullpath="${destination}/${image_name}"
-  out=$(hdiutil create -size ${image_size}k -volname ${image_name} -fs APFS -layout GPTSPUD -type SPARSE -attach ${destination_fullpath})
+  out=$(hdiutil create -size ${image_size}k -volname "${image_name}" -fs APFS -layout GPTSPUD -type SPARSE -attach "${destination_fullpath}")
 
 cat << EOF
 # Sparse image created at ${destination_fullpath}. Output: 
@@ -249,7 +250,7 @@ EOF
   # Commentary: The volume name should be the image name unless a volume with 
   # the same name already exists. This is to get the actual volume name from the
   # output of the hdiutil command.
-  VOLUME_NAME=$(echo "${out}" | sed -rn 's/.+(\/Volumes\/.+[^[:space:]]).*/\1/p')
+  VOLUME_NAME=$(echo "${out}" | sed -rn 's/.+(\/Volumes\/.+[^[:space:]]).*/\1/p' | head -1)
 }
 
 #######################################
@@ -277,19 +278,19 @@ cat << EOF
 # ----------------
 # Acquiring data from ${target} to ${volume_name}...
 EOF
-  if [[ ${tool} == "cp" ]]
+  if [[ "${tool}" == "cp" ]]
   then
-    cp -PRpvi "${target}/" "${volume_name}" > ${LOG_FILE} 2> ${ERR_FILE} && rc=$? || rc=$?
-  elif [[ ${tool} == "rsync" ]]
+    cp -PRpvi "${target}/" "${volume_name}" > "${LOG_FILE}" 2> "${ERR_FILE}" && rc=$? || rc=$?
+  elif [[ "${tool}" == "rsync" ]]
   then
-    rsync -artvqX "${target}/" "${volume_name}/" > ${LOG_FILE} 2> ${ERR_FILE} && rc=$? || rc=$?
+    rsync -artvqX "${target}/" "${volume_name}/" > "${LOG_FILE}" 2> "${ERR_FILE}" && rc=$? || rc=$?
   fi
 
   if [[ ${rc} -eq 0 ]]
   then
     printf "# Data from '%s' copied to '%s' with '%s' completed successfully\n\n" "${target}" "${volume_name}" "${tool}"
   else
-    printf "# ERROR: Copying data from '%s' to '%s' with '%s' hash failed with code '${rc}'" "${target}" "${volume_name}" "${tool}"
+    printf "# ERROR: Copying data from '%s' to '%s' with '%s' hash failed with code '${rc}'\n\n" "${target}" "${volume_name}" "${tool}"
   fi
 
   return ${rc}
@@ -519,14 +520,14 @@ main() {
       [[ "${assisted}" == "true" ]] && answer="y" || read -p "# Do you want to continue in assisted mode to identify the target? [yn] " answer
       case $answer in
           [Yy])
-            printf "# Assisted mode selected\n" | tee -a ${OUT_FILE}
+            printf "# Assisted mode selected\n" | tee -a "${OUT_FILE}"
             [[ -z "${target_name}" ]] && read -p "# Please provide the computer name of the target: " target_name
             [[ -z "${target_user}" ]] && read -p "# Please provide the username of the target: " target_user
             if [[ "${nopassword}" != "true" ]]
             then 
               [[ -z "${target_pass}" ]] && read -p "# Please provide the password of the target: " target_pass
             fi
-            mount_shared_disk "${target_name}" "${target_user}" "${target_pass}" "${target}" | tee -a ${OUT_FILE}
+            mount_shared_disk "${target_name}" "${target_user}" "${target_pass}" "${target}" | tee -a "${OUT_FILE}"
             break
             ;;
           [Nn]) 
@@ -538,7 +539,7 @@ main() {
     done
   fi
 
-  run_process | tee -a ${OUT_FILE}
+  run_process | tee -a "${OUT_FILE}"
 }
 
 main "${@:-}"
