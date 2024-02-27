@@ -30,6 +30,7 @@ set -o nounset
 # Global Variables
 
 VERSION="1.0"
+REPO="https://github.com/giuseppetotaro/asla"
 TOOLS=("cp" "rsync")
 OUT_FILE=
 LOG_FILE=
@@ -133,9 +134,9 @@ backup() {
     if [[ -f "${file}" ]]
     then
       mkdir "${destination}/${now}" 2>/dev/null && printf "# Created backup folder %s\n" "${destination}/${now}"
-      printf "# Backing up %s to %s\n" "${file}" "${destination}/${now}"
       fname=$(basename "${file}")
       mv "${file}" "${destination}/${now}/${now}.${fname}" 2>/dev/null
+      printf "# Backed up %s to %s\n" "${file}" "${destination}/${now}"
     fi
   done
 }
@@ -265,12 +266,10 @@ EOF
 # Outputs:
 #   Writes the paths to target and attached volume to stdout, copied files to 
 #   LOG_FILE, and errors to ERR_FILE.
-# Returns:
-#   0 if the copy is successful, non-zero on error.
 #######################################
 acquire_data() {
-  local target="${1}"
-  local volume_name="${2}"
+  local target=$(echo "${1}" | sed -e 's#[^/]$#&/#')
+  local volume_name=$(echo "${2}" | sed -e 's#[^/]$#&/#')
   local tool="${3}"
 
 cat << EOF
@@ -280,20 +279,20 @@ cat << EOF
 EOF
   if [[ "${tool}" == "cp" ]]
   then
-    cp -PRpvi "${target}/" "${volume_name}" > "${LOG_FILE}" 2> "${ERR_FILE}" && rc=$? || rc=$?
+    cp -PRpvi "${target}." "${volume_name}" > "${LOG_FILE}" 2> "${ERR_FILE}" && rc=$? || rc=$?
   elif [[ "${tool}" == "rsync" ]]
   then
-    rsync -artvqX "${target}/" "${volume_name}/" > "${LOG_FILE}" 2> "${ERR_FILE}" && rc=$? || rc=$?
+    rsync -artvqX --log-file="${LOG_FILE}" "${target}" "${volume_name}" > "${LOG_FILE}" 2> "${ERR_FILE}" && rc=$? || rc=$?
   fi
 
   if [[ ${rc} -eq 0 ]]
   then
-    printf "# Data from '%s' copied to '%s' with '%s' completed successfully\n\n" "${target}" "${volume_name}" "${tool}"
+    printf "# Data from %s copied to %s with %s completed successfully\n\n" "${target}" "${volume_name}" "${tool}"
   else
-    printf "# ERROR: Copying data from '%s' to '%s' with '%s' hash failed with code '${rc}'\n\n" "${target}" "${volume_name}" "${tool}"
+    printf "# Data from %s copied to %s with %s has terminated with error code %s\n" "${target}" "${volume_name}" "${tool}" "${rc}"
+    printf "# It is expected to encounter errors while copying some files. Please check '%s'\n\n" "${ERR_FILE}"
   fi
-
-  return ${rc}
+  #return ${rc}
 }
 
 #######################################
@@ -342,6 +341,9 @@ calculate_sha1() {
 
 #######################################
 # Print the summary of the acquisition process.
+# Globals:
+#   LOG_FILE
+#   ERR_FILE
 # Arguments:
 #   start_datetime, the start date and time of the acquisition process.
 #   destination, the destination folder.
@@ -371,14 +373,14 @@ EOF
   fi
 
   printf "\n# Process has completed. Output created in %s\n\n" "${destination}"
+  printf "# Please check the following log files about the copy:\n# FILES : %s\n# ERRORS: %s\n\n" "${LOG_FILE}" "${ERR_FILE}"
+  printf "# Thanks for using ASLA - %s\n\n" "${REPO}"
 }
 
 #######################################
 # Print the banner of the script.
 #######################################
 print_banner() {
-  clear -x  # Clear the screen without attempting to clear the terminal's 
-            # scrollback buffer
 cat << EOF
 #
 # Apple Silicon Logical Acquisition (ASLA)
@@ -393,12 +395,12 @@ EOF
 # Run the acquisition process.
 #######################################
 run_process() {
-  print_acquisition_info "${target}" "${destination}" "${image_name}" "${tool}"
-  create_sparse_image "${size}" "${destination}" "${image_name}"
+  print_acquisition_info "${target}" "${destination}" "${image_name}" "${tool}" #| tee -a "${OUT_FILE}"
+  create_sparse_image "${size}" "${destination}" "${image_name}" #| tee -a "${OUT_FILE}"
   trap cleanup EXIT
-  acquire_data "${target}" "${VOLUME_NAME}" "${tool}"
-  detach_image "${VOLUME_NAME}"
-  print_summary "${start_datetime}" "${destination}" "${image_name}" "${hash}"
+  acquire_data "${target}" "${VOLUME_NAME}" "${tool}" #| tee -a "${OUT_FILE}"
+  detach_image "${VOLUME_NAME}" #| tee -a "${OUT_FILE}"
+  print_summary "${start_datetime}" "${destination}" "${image_name}" "${hash}" #| tee -a "${OUT_FILE}"
 }
 
 #######################################
@@ -507,7 +509,9 @@ main() {
   LOG_FILE="${destination}/${image_name}.log"
   ERR_FILE="${destination}/${image_name}.err"
 
-  print_banner
+  clear -x  # Clear the screen without attempting to clear the terminal's 
+            # scrollback buffer
+  print_banner | tee "${OUT_FILE}"
 
   backup "${destination}" "${image_name}"
 
