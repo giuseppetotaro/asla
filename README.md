@@ -30,7 +30,7 @@ It also provides the possibility to run in _assisted mode_, to help you in ident
 
 ### Procedure
 
-Sharing the disk of an Apple Silicon Mac device (i.e., share disk mode) is a crucial step in performing logical acquisitions. While the procedure is officially documented by [Apple](https://support.apple.com/guide/mac-help/transfer-files-a-mac-apple-silicon-mchlb37e8ca7/mac), based on practical experience, there are certain nuances and tricks that can streamline the process and mitigate potential challenges. 
+Sharing the disk of an Apple Silicon Mac device (i.e., share disk mode) is a crucial step in performing logical acquisitions. While the procedure is officially [documented by Apple](https://support.apple.com/guide/mac-help/transfer-files-a-mac-apple-silicon-mchlb37e8ca7/mac), based on practical experience, there are certain nuances and tricks that can streamline the process and mitigate potential challenges. 
 This section will provide comprehensive instructions to effectively enable share disk mode on Apple Silicon Mac devices. 
 By following these steps, you can confidently initiate the share disk mode and proceed with the logical acquisition:
 
@@ -39,19 +39,19 @@ By following these steps, you can confidently initiate the share disk mode and p
 
 1. The target must be started in Recovery Mode (press and hold power button).
 2. Selecting _Options_ opens macOS Recovery.
-3. If requested, enter the password for an administrator account.
-4. From the menu on the top, select _Utilities_ > _Share Disk_ to start sharing.
-5. If the disk is locked with File Vault, it must be unlocked by entering the password.
-6. Ensure the host is powered on be and connected to power charger, before connecting to the target.
-7. Power supply to the target should be provided only after connecting to the host (it has been experienced that an Apple Silicon Mac is not seen if it is already connected to the power supply).
-8. Connect from a USB-C port on the target to a USB-C port on the host via USB or [Thunderbolt 3 (TB3) cable](https://support.apple.com/en-us/111750).
-9. Onve connected, you should hear a sound which means that (most probably) the target is connected to the host.
+3. If requested, select a user and enter the password for.
+4. Once Recovery Mode starts, from the menu on the top, select _Utilities_ > _Share Disk_ to start sharing.
+5. Select the disk that you want to share. If the disk is locked with File Vault, it must be unlocked by entering the password.
+6. Share the disk by clicking _Start Sharing_.
+7. Ensure the host is powered on and connected to power charger, before connecting to the target. Power supply to the target should be provided only after connecting to the host (it has been experienced that an Apple Silicon Mac is not seen if it is already connected to the power supply).
+8. Connect from a USB-C port on the target to a USB-C port on the host via USB or [Thunderbolt 3 (TB3) cable](https://support.apple.com/en-us/111750). The host should prompt to [allow accessory to connect](https://support.apple.com/guide/mac-help/allow-accessories-to-connect-mchlf779ae93/mac) (the [setting](https://support.apple.com/en-us/102282) for allowing accessories to connect can be easily changed).
+9. Once connected, you should hear a sound which means that (most probably) the target is connected to the host.
 10. Connect the target with power supply.
-11. With Finder, select _Go_ > _Network_ (or press SHIFT+CMD+K) and check if you see target's name (e.g., MacBook Air), as you can see below.
+11. With Finder, select _Go_ > _Network_ (or press SHIFT+CMD+K) and check if you see an icon with the target's name (e.g., MacBook Air), as you can see below.
 
 ![Finder Network](finder_network.png)
 
-To ensure the shared disk is mounted in read-only mode, users can utilize the `asla.sh` in assisted mode (`-a` option), which helps in identifying the target and automatically mounts the shared disk in read-only mode:
+To ensure the shared disk will be mounted in read-only mode, users can utilize the `asla.sh` in assisted mode (`-a` option), which indeed helps in identifying the target and automatically mounts the shared disk in read-only mode:
 
 ```
 ./asla.sh -a TARGET DESTINATION
@@ -71,6 +71,8 @@ or
 
 where `TARGET` and `DESTINATION` are the paths to the mount point of the target's shared disk and the location (preferably external) where the acquisition will be saved respectively.
 
+![The script in action](asla_in_action.png)
+
 ## Installation
 
 This script can be executed in Terminal and would not need any specific software besides those already provided in macOS.
@@ -82,7 +84,7 @@ This script has been tested on macOS Sonoma (Version 14.3) with the Xcode Comman
 
 ## Usage
 
-The `asla.sh` script offers a concise but effective help message using the `-a` option as follows:
+The `asla.sh` script offers a concise but effective help message using the `-h` option as follows:
 
 `% ./asla.sh -h`
 
