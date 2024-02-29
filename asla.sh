@@ -223,14 +223,16 @@ EOF
 #   image_size, the size of the sparse image in KiloBytes.
 #   destination, the destination folder where the sparse image will be created.
 #   image_name, the name of the sparse image.
+#   target, the target folder
 # Outputs:
 #   Writes the backup folder and files to stdout.
 #######################################
 create_sparse_image() {
   local image_size=${1}
-  local destination=${2}
-  local image_name=${3}  # To be used as volume name
-  [[ -z "${image_size}" ]] && image_size=$(df -k "${destination}" | tail -1 | awk '{print (substr($2,1,1)+1)*(10^(length($2)-1))}')
+  local destination="${2}"
+  local image_name="${3}"  # To be used as volume name
+  local target="${4}"
+  [[ -z "${image_size}" ]] && image_size=$(df -k "${target}" | tail -1 | awk '{print (substr($2,1,1)+1)*(10^(length($2)-1))}')
 
 cat << EOF
 # Sparse Image
@@ -292,7 +294,6 @@ EOF
     printf "# Data from %s copied to %s with %s has terminated with error code %s\n" "${target}" "${volume_name}" "${tool}" "${rc}"
     printf "# It is expected to encounter errors while copying some files. Please check '%s'\n\n" "${ERR_FILE}"
   fi
-  #return ${rc}
 }
 
 #######################################
@@ -395,12 +396,12 @@ EOF
 # Run the acquisition process.
 #######################################
 run_process() {
-  print_acquisition_info "${target}" "${destination}" "${image_name}" "${tool}" #| tee -a "${OUT_FILE}"
-  create_sparse_image "${size}" "${destination}" "${image_name}" #| tee -a "${OUT_FILE}"
+  print_acquisition_info "${target}" "${destination}" "${image_name}" "${tool}"
+  create_sparse_image "${size}" "${destination}" "${image_name}" "${target}"
   trap cleanup EXIT
-  acquire_data "${target}" "${VOLUME_NAME}" "${tool}" #| tee -a "${OUT_FILE}"
-  detach_image "${VOLUME_NAME}" #| tee -a "${OUT_FILE}"
-  print_summary "${start_datetime}" "${destination}" "${image_name}" "${hash}" #| tee -a "${OUT_FILE}"
+  acquire_data "${target}" "${VOLUME_NAME}" "${tool}"
+  detach_image "${VOLUME_NAME}"
+  print_summary "${start_datetime}" "${destination}" "${image_name}" "${hash}"
 }
 
 #######################################
@@ -511,7 +512,7 @@ main() {
 
   clear -x  # Clear the screen without attempting to clear the terminal's 
             # scrollback buffer
-  print_banner | tee "${OUT_FILE}"
+  print_banner
 
   backup "${destination}" "${image_name}"
 
