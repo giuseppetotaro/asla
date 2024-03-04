@@ -23,9 +23,9 @@
 # Notes      : The target must be started in "share disk mode".
 #
 
-set -o errexit
-set -o pipefail
-set -o nounset
+#set -o errexit
+#set -o pipefail
+#set -o nounset
 
 # Global Variables
 
@@ -246,7 +246,7 @@ EOF
 
 cat << EOF
 # Sparse image created at ${destination_fullpath}. Output: 
-"${out}"
+${out}
 
 EOF
 
@@ -362,8 +362,8 @@ print_summary() {
 cat << EOF
 # Summary
 # -------
-# Start time:  ${start_datetime}"
-# End time:    $(date)"
+# Start time:  ${start_datetime}
+# End time:    $(date)
 # Destination: ${destination}
 # Image Name:  ${image_name}.sparseimage
 EOF
