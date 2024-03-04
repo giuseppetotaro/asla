@@ -151,3 +151,8 @@ Their expertise and dedication greatly enhanced the quality and reliability of t
 ## License
 
 This project is licensed under the [MIT License](LICENSE). Feel free to modify and distribute the script according to the terms of this license.
+
+# Roadmap
+
+- [ ] Option to convert sparse image to dmg
+- [ ] Option to automatically unmount the target at the end
