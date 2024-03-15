@@ -3,6 +3,8 @@
 The Apple Silicon Logical Acquisition (ASLA) script in this repository is a bash script called `asla.sh` designed for performing logical acquisition of Apple Silicon Mac devices. 
 This script facilitates the collection of data from an Apple Silicon Mac in a forensically-sound manner.
 
+The use of ASLA is further documented with more examples in [this blog post](https://giuseppetotaro.github.io/mac/forensics/2024/02/23/forensic-logical-acquisition-of-apple-silicon.html).
+
 ## Description
 
 To transfer files from an Apple Silicon Mac device to another Mac, you can leverage the _share disk mode_, which turns the system into an [SMB file sharing server](https://www.macrumors.com/how-to/transfer-files-apple-silicon-mac-to-mac/), providing another Mac device connected to it with file-level access to user data. 
